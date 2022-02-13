@@ -4,6 +4,7 @@ const app = express()
 const path =require('path')
 const hbs = require('hbs')
 const bcrypt = require('bcryptjs')
+const cookieParser = require('cookie-parser')
 
 // const securePassword = async (password) => {
 //     const hashPassword = await bcrypt.hash(password,10);
@@ -22,7 +23,8 @@ const Register = require('./models/registers')
 const static_path = path.join(__dirname,"../public")
 const template_path = path.join(__dirname,"../templates/views")
 const partials_path = path.join(__dirname,"../templates/partials")
-
+app.use(express.json())
+app.use(cookieParser())
 app.use(express.urlencoded({extended:false}))
 app.set("view engine", "hbs")
 app.set('views',template_path)
@@ -31,6 +33,10 @@ hbs.registerPartials(partials_path)
 
 app.get('/',(req,res)=>{
     res.render("index");    
+})
+app.get('/secret',(req,res)=>{
+    console.log(`${req.cookies.jwt} cokkie sajkdhagd `);
+    res.render("secret");    
 })
 app.get('/login',(req,res)=>{
     res.render("login");    
