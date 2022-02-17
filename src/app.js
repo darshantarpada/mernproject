@@ -5,6 +5,7 @@ const path =require('path')
 const hbs = require('hbs')
 const bcrypt = require('bcryptjs')
 const cookieParser = require('cookie-parser')
+const auth = require('./middleware/auth')
 
 // const securePassword = async (password) => {
 //     const hashPassword = await bcrypt.hash(password,10);
@@ -34,12 +35,28 @@ hbs.registerPartials(partials_path)
 app.get('/',(req,res)=>{
     res.render("index");    
 })
-app.get('/secret',(req,res)=>{
+app.get('/secret',auth,(req,res)=>{
     console.log(`${req.cookies.jwt} cokkie sajkdhagd `);
     res.render("secret");    
 })
 app.get('/login',(req,res)=>{
     res.render("login");    
+})
+app.get('/logout',auth,async(req,res)=>{
+    try{
+        console.log(req.user);
+        req.user.tokens = req.user.tokens.filter((currentElement)=>{
+            console.log("REQ_CURRENTEMLEMNT"+currentElement.token)
+            console.log("REQ_TOKEN"+req.token)
+            return currentElement.token != req.token
+        })
+        res.clearCookie('jwt')
+        console.log('logout ');
+        await req.user.save(); 
+        res.render('login')
+    }catch(error){
+        res.status(500).send(error);
+    }
 })
 app.get('/register',(req,res)=>{
     res.render("register");    
